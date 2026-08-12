@@ -304,6 +304,3 @@ interface IOrderResult {
   total: number;   // Общая сумма заказа
 }
 ```
-
-
-
