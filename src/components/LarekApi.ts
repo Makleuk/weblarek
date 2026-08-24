@@ -7,11 +7,11 @@ export class LarekApi {
     this._api = api;
   }
 
-  getProducts(): Promise<IProductsResponse> {
+  async getProducts(): Promise<IProductsResponse> {
     return this._api.get('/product');
   }
 
-  createOrder(order: IOrder): Promise<IOrderResult> {
+  async createOrder(order: IOrder): Promise<IOrderResult> {
     return this._api.post('/order', order);
   }
 }

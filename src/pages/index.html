@@ -81,14 +81,17 @@
 	</template>
 
 	<template id="basket">
-		<div class="basket">
-			<h2 class="modal__title">Корзина</h2>
-			<ul class="basket__list">
-				
-			</ul>
-			<div class="modal__actions">
-				<button class="button basket__button">Оформить</button>
-				<span class="basket__price">0 синапсов</span>
+		<div class="modal__content">
+			<div class="basket">
+				<h2 class="modal__title">Корзина</h2>
+				<!-- Вот этот элемент отсутствовал -->
+				<ul class="basket__list">
+					<!-- Сюда JavaScript будет добавлять карточки товаров -->
+				</ul>
+				<div class="basket__actions">
+					<button class="button">Оформить</button>
+					<span class="basket__price">0 синапсов</span>
+				</div>
 			</div>
 		</div>
 	</template>
@@ -116,19 +119,19 @@
 	</template>
 
 	<template id="contacts">
-		<form class="form" name="contacts">
+		<form class="form contacts">
 			<div class="order">
 				<label class="order__field">
 					<span class="form__label modal__title">Email</span>
-					<input name="email" class="form__input" type="text" placeholder="Введите Email" />
+					<input name="email" class="form__input" type="email" placeholder="Введите Email" />
 				</label>
 				<label class="order__field">
 					<span class="form__label modal__title">Телефон</span>
-					<input name="phone" class="form__input" type="text" placeholder="+7 (" />
+					<input name="phone" class="form__input" type="tel" placeholder="+7 (" />
 				</label>
 			</div>
 			<div class="modal__actions">
-				<button type="submit" disabled class="button">Оплатить</button>
+				<button type="submit" class="button">Оплатить</button>
 				<span class="form__errors"></span>
 			</div>
 		</form>
