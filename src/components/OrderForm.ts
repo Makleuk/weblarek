@@ -32,15 +32,21 @@ export class OrderForm extends Form<Partial<IBuyer>> {
         this.onSubmitCallback();
     }
     
-    updateForm(data: Partial<IBuyer>, errors: Record<string, string>): void {
-        super.updateForm(data, errors);
-        
-        this.paymentButtons.forEach(btn => {
-            btn.classList.toggle('button_alt-active', btn.name === data.payment);
-        });
-        
-        if (data.address !== undefined && this.addressInput && this.addressInput.value !== data.address) {
-            this.addressInput.value = data.address;
-        }
+    set errors(errors: Record<string, string>) {
+        super.errors = errors;
     }
+
+    render(data?: Partial<IBuyer>): HTMLElement {
+        if (data) {
+            if (data.address !== undefined && this.addressInput) {
+                this.addressInput.value = data.address;
+            }
+            
+            this.paymentButtons.forEach(btn => {
+                btn.classList.toggle('button_alt-active', btn.name === data.payment);
+            });
+        }
+        return this.container;
+    }
+    
 }
