@@ -12,6 +12,14 @@ export class BuyerModel {
         this.events = events;
     }
 
+    setData(data: Partial<IBuyer>): void {
+        if (data.payment !== undefined) this._payment = data.payment;
+        if (data.address !== undefined) this._address = data.address;
+        if (data.email !== undefined) this._email = data.email;
+        if (data.phone !== undefined) this._phone = data.phone;
+        this.events.emit('buyer:changed', this.getData());
+    }
+
     setPayment(payment: TPayment): void {
         this._payment = payment;
         this.events.emit('buyer:changed', this.getData());
@@ -23,40 +31,20 @@ export class BuyerModel {
     }
 
     setEmail(email: string): void {
-        console.log('BuyerModel setEmail:', email); // Для отладки
+        console.log('BuyerModel setEmail:', email);
         this._email = email;
         this.events.emit('buyer:changed', this.getData());
     }
 
     setPhone(phone: string): void {
-        console.log('BuyerModel setPhone:', phone); // Для отладки
+        console.log('BuyerModel setPhone:', phone);
         this._phone = phone;
         this.events.emit('buyer:changed', this.getData());
     }
     
-    updateOrderData(data: { payment?: TPayment; address?: string }): void {
-        if (data.payment !== undefined) this._payment = data.payment;
-        if (data.address !== undefined) this._address = data.address;
-        this.events.emit('buyer:changed', this.getData());
-    }
+    // УДАЛИТЬ updateOrderData и updateContactsData - они не нужны
+    // Вместо них используем setData или отдельные сеттеры
     
-    updateContactsData(data: { email?: string; phone?: string }): void {
-        console.log('updateContactsData BEFORE:', { email: this._email, phone: this._phone });
-        console.log('updateContactsData DATA:', data);
-        
-        if (data.email !== undefined) {
-            this._email = data.email;
-            console.log('Email updated to:', this._email);
-        }
-        if (data.phone !== undefined) {
-            this._phone = data.phone;
-            console.log('Phone updated to:', this._phone);
-        }
-        
-        console.log('updateContactsData AFTER:', { email: this._email, phone: this._phone });
-        this.events.emit('buyer:changed', this.getData());
-    }
-
     getData(): IBuyer {
         return {
             payment: this._payment,
@@ -74,20 +62,21 @@ export class BuyerModel {
         this.events.emit('buyer:changed', this.getData());
     }
     
-    validateOrder(): FormErrors {
+    // УДАЛИТЬ validateOrder() и validateContacts()
+    // Оставить только один универсальный validate()
+    validate(): FormErrors {
         const errors: FormErrors = {};
+        
+        // Валидация первой формы
         if (!this._payment) {
             errors.payment = 'Выберите способ оплаты';
         }
         if (!this._address.trim()) {
             errors.address = 'Введите адрес доставки';
         }
-        return errors;
-    }
-    
-    validateContacts(): FormErrors {
-        console.log('validateContacts called with:', { email: this._email, phone: this._phone });
-        const errors: FormErrors = {};
+        
+        // Валидация второй формы
+        console.log('validate called with:', { email: this._email, phone: this._phone });
         if (!this._email || !this._email.trim()) {
             errors.email = 'Введите email';
             console.log('Email validation failed');
@@ -96,14 +85,8 @@ export class BuyerModel {
             errors.phone = 'Введите номер телефона';
             console.log('Phone validation failed');
         }
-        console.log('validateContacts result:', errors);
+        
+        console.log('validate result:', errors);
         return errors;
-    }
-    
-    validate(): FormErrors {
-        return {
-            ...this.validateOrder(),
-            ...this.validateContacts()
-        };
     }
 }
