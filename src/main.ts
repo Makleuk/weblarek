@@ -42,13 +42,13 @@ const previewCard = new CardPreview(
 
 const orderForm = new OrderForm(
     document.querySelector('#order')! as HTMLTemplateElement,
-    (data) => buyerModel.updateOrderData(data),
+    (data) => buyerModel.setData(data),
     () => events.emit('order:submit')
 );
 
 const contactsForm = new ContactsForm(
     document.querySelector('#contacts')! as HTMLTemplateElement,
-    (data) => buyerModel.updateContactsData(data),
+    (data) => buyerModel.setData(data),
     () => events.emit('contacts:submit')
 );
 
@@ -69,8 +69,8 @@ function updateBasketView(): void {
     basketView.updateView(cardElements, basketModel.getTotal());
 }
 
-events.on('catalog:changed', (items: IProduct[]) => {
-    const cardElements = items.map(product => {
+events.on('catalog:changed', (data: { items: IProduct[] }) => {
+    const cardElements = data.items.map(product => {
         const card = new CardCatalog(
             document.querySelector('#card-catalog')! as HTMLTemplateElement,
             () => catalogModel.setSelectedProduct(product.id)
@@ -80,7 +80,8 @@ events.on('catalog:changed', (items: IProduct[]) => {
     gallery.setItems(cardElements);
 });
 
-events.on('selected:changed', (product: IProduct | null) => {
+events.on('selected:changed', (data: { product: IProduct | null }) => {
+    const product = data.product;
     if (!product) return;
     
     const isInBasket = basketModel.contains(product.id);
@@ -121,8 +122,12 @@ events.on('card:action', () => {
 });
 
 events.on('buyer:changed', (data: IBuyer) => {
-    orderForm.updateForm(data, buyerModel.validateOrder());
-    contactsForm.updateForm(data, buyerModel.validateContacts());
+    orderForm.render(data);
+    contactsForm.render(data);
+    
+    const errors = buyerModel.validate();
+    orderForm.errors = errors;
+    contactsForm.errors = errors;
 });
 
 events.on('basket:click', () => {
@@ -132,28 +137,34 @@ events.on('basket:click', () => {
 
 events.on('basket:checkout', () => {
     buyerModel.clear();
-    modal.setContent(orderForm.render());
+    modal.setContent(orderForm.render(buyerModel.getData()));
     modal.open();
-    orderForm.updateForm(buyerModel.getData(), buyerModel.validateOrder());
 });
 
 events.on('order:submit', () => {
-    const errors = buyerModel.validateOrder();
+    const errors = buyerModel.validate();
     
-    if (Object.keys(errors).length > 0) {
-        orderForm.updateForm(buyerModel.getData(), errors);
+    const orderErrors: Record<string, string> = {};
+    if (errors.payment) orderErrors.payment = errors.payment;
+    if (errors.address) orderErrors.address = errors.address;
+    
+    if (Object.keys(orderErrors).length > 0) {
+        orderForm.errors = orderErrors;
         return;
     }
     
-    modal.setContent(contactsForm.render());
-    contactsForm.updateForm(buyerModel.getData(), buyerModel.validateContacts());
+    modal.setContent(contactsForm.render(buyerModel.getData()));
 });
 
 events.on('contacts:submit', () => {
-    const errors = buyerModel.validateContacts();
+    const errors = buyerModel.validate();
     
-    if (Object.keys(errors).length > 0) {
-        contactsForm.updateForm(buyerModel.getData(), errors);
+    const contactsErrors: Record<string, string> = {};
+    if (errors.email) contactsErrors.email = errors.email;
+    if (errors.phone) contactsErrors.phone = errors.phone;
+    
+    if (Object.keys(contactsErrors).length > 0) {
+        contactsForm.errors = contactsErrors;
         return;
     }
     
@@ -175,7 +186,7 @@ events.on('contacts:submit', () => {
             buyerModel.clear();
         })
         .catch((error) => {
-            contactsForm.setFormError('Произошла ошибка при оформлении заказа');
+            contactsForm.errors = { form: 'Произошла ошибка при оформлении заказа' };
         });
 });
 
