@@ -36,3 +36,8 @@ export class CatalogModel {
         return this._selectedProduct;
     }
 }
+
+    getSelectedProduct(): IProduct | null {
+        return this._selectedProduct;
+    }
+}
