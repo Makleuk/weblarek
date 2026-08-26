@@ -13,9 +13,9 @@ export class Modal extends Component<unknown> {
         this.content = ensureElement<HTMLElement>('.modal__content', container);
         this.closeBtn = ensureElement<HTMLButtonElement>('.modal__close', container);
         
-        this.closeBtn.addEventListener('click', () => this.events.emit('modal:close'));
+        this.closeBtn.addEventListener('click', () => this.close());
         container.addEventListener('click', (e: MouseEvent) => {
-            if (e.target === container) this.events.emit('modal:close');
+            if (e.target === container) this.close();
         });
     }
 
@@ -26,16 +26,14 @@ export class Modal extends Component<unknown> {
     close(): void {
         this.container.classList.remove('modal_active');
         this.content.replaceChildren();
+        this.events.emit('modal:close'); 
     }
     
     isOpen(): boolean {
         return this.container.classList.contains('modal_active');
     }
     
-    getContent(): HTMLElement {
-        return this.content;
-    }
-
+    
     setContent(content: HTMLElement): void {
         this.content.replaceChildren(content);
     }
