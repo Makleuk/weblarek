@@ -25,30 +25,12 @@ export abstract class Form<T> extends Component<T> {
     
     protected abstract onSubmit(): void;
 
-    updateForm(data: Partial<T>, errors: Record<string, string>): void {
-        
-        for (const key in data) {
-            if (this.inputs[key] && data[key] !== undefined) {
-                const newValue = String(data[key]);
-                if (this.inputs[key].value !== newValue) {
-                    this.inputs[key].value = newValue;
-                }
-            }
-        }
-        
+    set errors(errors: Record<string, string>) {
         const errorMessages = Object.values(errors).filter(msg => msg && msg !== 'form');
         this.errorsElement.textContent = errorMessages.join('; ');
         
         const isValid = Object.keys(errors).length === 0;
         this.submitButton.disabled = !isValid;
-    }
-    
-    setFormError(error: string): void {
-        this.errorsElement.textContent = error;
-    }
-    
-    clearErrors(): void {
-        this.errorsElement.textContent = '';
     }
 
     render(): HTMLElement {
