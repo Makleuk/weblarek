@@ -33,14 +33,20 @@ export class ContactsForm extends Form<Partial<IBuyer>> {
         this.onSubmitCallback();
     }
     
-    updateForm(data: Partial<IBuyer>, errors: Record<string, string>): void {
-        super.updateForm(data, errors);
-        
-        if (data.email !== undefined && this.emailInput && this.emailInput.value !== data.email) {
-            this.emailInput.value = data.email;
-        }
-        if (data.phone !== undefined && this.phoneInput && this.phoneInput.value !== data.phone) {
-            this.phoneInput.value = data.phone;
-        }
+    set errors(errors: Record<string, string>) {
+        super.errors = errors;
     }
+    
+    render(data?: Partial<IBuyer>): HTMLElement {
+        if (data) {
+            if (data.email !== undefined && this.emailInput) {
+                this.emailInput.value = data.email;
+            }
+            if (data.phone !== undefined && this.phoneInput) {
+                this.phoneInput.value = data.phone;
+            }
+        }
+        return this.container;
+    }
+    
 }
